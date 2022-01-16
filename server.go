@@ -11,7 +11,7 @@ import (
 	"os"
 )
 
-func main(){
+func main() {
 
 	//<editor-fold desc="DB CONFIGURATION">
 	database.CreateUniqueIndex(dal.GetUserCollection(), "email")
@@ -32,6 +32,7 @@ func main(){
 	router := gin.New()
 	router.Use(gin.Logger())
 	routes.UserRoutes(router)
+	routes.HealthRoutes(router)
 
 	router.Use(middleware.Authentication())
 
@@ -40,11 +41,6 @@ func main(){
 
 		c.JSON(200, gin.H{"success": "Access granted for api-1"})
 
-	})
-
-	// API-1
-	router.GET("/api-2", func(c *gin.Context) {
-		c.JSON(200, gin.H{"success": "Access granted for api-2"})
 	})
 
 	router.Run(":" + port)

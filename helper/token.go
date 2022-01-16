@@ -1,6 +1,7 @@
 package helper
 
 import (
+	"IdentityUser/constant"
 	"IdentityUser/dal"
 	"IdentityUser/model"
 	"context"
@@ -62,9 +63,10 @@ func ValidateToken(signedToken string) (claims *model.SignedDetails, msg string)
 		return
 	}
 
+	// FIXME should throw 401 on token expired
 	claims, ok := token.Claims.(*model.SignedDetails)
 	if !ok {
-		msg = fmt.Sprintf("The token is invalid")
+		msg = constant.InvalidToken
 		msg = err.Error()
 		return
 	}
@@ -72,7 +74,7 @@ func ValidateToken(signedToken string) (claims *model.SignedDetails, msg string)
 	if claims.ExpiresAt < time.Now().Local().Unix() {
 		msg = fmt.Sprintf("Session is expired")
 		msg = err.Error()
-		return
+		return nil, msg
 	}
 
 	return claims, msg
