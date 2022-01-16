@@ -41,17 +41,16 @@ func SignUp() gin.HandlerFunc {
 			return
 		}
 
-	/*	_, err := userCollection.CountDocuments(ctx, bson.M{"email": user.Email})
+		/*	_, err := userCollection.CountDocuments(ctx, bson.M{"email": user.Email})
 
-		if err != nil {
-			c.JSON(http.StatusInternalServerError, model.Error{Message: constant.InternalServerError}.GetAsEnvelope())
-			log.Panic(err)
-			return
-		}*/
+			if err != nil {
+				c.JSON(http.StatusInternalServerError, model.Error{Message: constant.InternalServerError}.GetAsEnvelope())
+				log.Panic(err)
+				return
+			}*/
 
 		password := helper.HashPassword(*user.Password)
 		user.Password = &password
-
 
 		user.CreatedAt, _ = time.Parse(time.RFC3339, time.Now().Format(time.RFC3339))
 		user.UpdatedAt, _ = time.Parse(time.RFC3339, time.Now().Format(time.RFC3339))
@@ -60,7 +59,6 @@ func SignUp() gin.HandlerFunc {
 		token, refreshToken, _ := helper.GenerateAllTokens(*user.Email, *user.FirstName, *user.LastName, user.UserId)
 		user.Token = &token
 		user.RefreshToken = &refreshToken
-
 
 		_, insertErr := userCollection.InsertOne(ctx, user)
 		if insertErr != nil {
