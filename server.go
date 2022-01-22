@@ -3,7 +3,6 @@ package main
 import (
 	"IdentityUser/dal"
 	"IdentityUser/database"
-	"IdentityUser/middleware"
 	"IdentityUser/routes"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
@@ -33,8 +32,7 @@ func main() {
 	router.Use(gin.Logger())
 	routes.UserRoutes(router)
 	routes.HealthRoutes(router)
-
-	router.Use(middleware.Authentication())
+	routes.AuthRoutes(router)
 
 	router.Run(":" + port)
 }
