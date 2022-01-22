@@ -56,7 +56,7 @@ func SignUp() gin.HandlerFunc {
 		user.UpdatedAt, _ = time.Parse(time.RFC3339, time.Now().Format(time.RFC3339))
 		user.ID = primitive.NewObjectID()
 		user.UserId = user.ID.Hex()
-		token, refreshToken, _ := helper.GenerateAllTokens(*user.Email, *user.FirstName, *user.LastName, user.UserId)
+		token, refreshToken, _ := helper.GenerateAllTokens(*user.Email, *user.UserName, user.UserId)
 		user.Token = &token
 		user.RefreshToken = &refreshToken
 
@@ -104,11 +104,11 @@ func Login() gin.HandlerFunc {
 		passwordIsValid, _ := helper.VerifyPassword(*user.Password, *foundUser.Password)
 
 		if passwordIsValid != true {
-			c.JSON(http.StatusInternalServerError, model.Error{Message: constant.PasswordOrMailValidationError}.GetAsEnvelope())
+			c.JSON(http.StatusUnauthorized, model.Error{Message: constant.PasswordOrMailValidationError}.GetAsEnvelope())
 			return
 		}
 
-		token, refreshToken, _ := helper.GenerateAllTokens(*foundUser.Email, *foundUser.FirstName, *foundUser.LastName, foundUser.UserId)
+		token, refreshToken, _ := helper.GenerateAllTokens(*foundUser.Email, *foundUser.UserName, foundUser.UserId)
 
 		helper.UpdateAllTokens(token, refreshToken, foundUser.UserId)
 

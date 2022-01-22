@@ -20,12 +20,11 @@ var userCollection = dal.GetUserCollection()
 var SecretKey string = os.Getenv("SECRET_KEY")
 
 // GenerateAllTokens generates both teh detailed token and refresh token
-func GenerateAllTokens(email string, firstName string, lastName string, uid string) (signedToken string, signedRefreshToken string, err error) {
+func GenerateAllTokens(email string, userName string, uid string) (signedToken string, signedRefreshToken string, err error) {
 	claims := &model.SignedDetails{
-		Email:     email,
-		FirstName: firstName,
-		LastName:  lastName,
-		Uid:       uid,
+		Email:    email,
+		UserName: userName,
+		Uid:      uid,
 		StandardClaims: jwt.StandardClaims{
 			ExpiresAt: time.Now().Local().Add(time.Hour * time.Duration(24)).Unix(),
 		},
