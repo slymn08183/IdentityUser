@@ -59,6 +59,8 @@ func SignUp() gin.HandlerFunc {
 		token, refreshToken, _ := helper.GenerateAllTokens(*user.Email, *user.UserName, user.UserId)
 		user.Token = &token
 		user.RefreshToken = &refreshToken
+		str := "None"
+		user.DeviceToken = &str
 
 		_, insertErr := userCollection.InsertOne(ctx, user)
 		if insertErr != nil {
@@ -85,7 +87,7 @@ func SignUp() gin.HandlerFunc {
 func Login() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var ctx, cancel = context.WithTimeout(context.Background(), 100*time.Second)
-		var user entity.User
+		var user model.User
 		var foundUser entity.User
 		defer cancel()
 
@@ -94,8 +96,7 @@ func Login() gin.HandlerFunc {
 			return
 		}
 
-		err := userCollection.FindOne(ctx, bson.M{"email": user.Email}).Decode(&foundUser)
-
+		err := userCollection.FindOneAndUpdate(ctx, bson.M{"email": user.Email}, bson.M{"deviceToken": user.DeviceToken}).Decode(&foundUser)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, model.Error{Message: err.Error()}.GetAsEnvelope())
 			return
