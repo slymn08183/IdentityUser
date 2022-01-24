@@ -42,11 +42,10 @@ func SignUp() gin.HandlerFunc {
 		}
 
 		/*	_, err := userCollection.CountDocuments(ctx, bson.M{"email": user.Email})
-
 			if err != nil {
-				c.JSON(http.StatusInternalServerError, model.Error{Message: constant.InternalServerError}.GetAsEnvelope())
-				log.Panic(err)
-				return
+			c.JSON(http.StatusInternalServerError, model.Error{Message: constant.InternalServerError}.GetAsEnvelope())
+			log.Panic(err)
+			return
 			}*/
 
 		password := helper.HashPassword(*user.Password)
@@ -96,7 +95,16 @@ func Login() gin.HandlerFunc {
 			return
 		}
 
-		err := userCollection.FindOneAndUpdate(ctx, bson.M{"email": user.Email}, bson.M{"deviceToken": user.DeviceToken}).Decode(&foundUser)
+		if user.DeviceToken == nil {
+			str := ""
+			user.DeviceToken = &str
+		}
+
+		update := bson.M{
+			"$set": bson.M{"deviceToken": user.DeviceToken},
+		}
+
+		err := userCollection.FindOneAndUpdate(ctx, bson.M{"email": user.Email}, &update).Decode(&foundUser)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, model.Error{Message: err.Error()}.GetAsEnvelope())
 			return
